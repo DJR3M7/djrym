@@ -9,6 +9,7 @@
 <meta property="og:description" content="Allround DJ · DnB · Techno · Trance · Club">
 <meta property="og:image" content="logo.png">
 <meta name="theme-color" content="#070707">
+<link rel="canonical" href="https://djr3m7.github.io/djrym/">
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,15 +106,15 @@
   .gig p { margin: 6px 0 0; color: var(--muted); font: 13px var(--mono); }
   .gig .next-tag { display: inline-block; margin-left: 10px; vertical-align: middle; font: 600 10px var(--mono);
                    letter-spacing: .15em; padding: 3px 8px; background: var(--accent); color: var(--bg); }
-  .gig a.more { font: 600 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; text-decoration: none;
+  .gig .more { font: 600 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; text-decoration: none;
                 border: 1px solid var(--line); padding: 10px 14px; white-space: nowrap; }
-  .gig a.more:hover { border-color: var(--accent); color: var(--accent); }
+  .gig .more:hover { border-color: var(--accent); color: var(--accent); }
   .empty { color: var(--muted); font: 14px var(--mono); padding: 22px 6px; }
   @media (max-width: 640px) {
     .gig { grid-template-columns: 74px 1fr; gap: 16px; }
     .gig .date { font-size: 34px; }
     .gig h3 { font-size: 20px; }
-    .gig a.more { grid-column: 2; justify-self: start; }
+
   }
 
   /* sound */
@@ -159,6 +160,20 @@
                transition: color .2s, padding .2s; }
   .venues li:hover { color: var(--accent); padding-left: 8px; }
   .venues li small { font: 600 11px var(--mono); letter-spacing: .18em; color: var(--muted); }
+
+  /* agenda-knop, teller, recent */
+  a.toggle { text-decoration: none; }
+  a.toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .gig .acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .gig button.more { background: transparent; color: var(--ink); cursor: pointer; }
+  .gig button.more:hover { border-color: var(--accent); color: var(--accent); }
+  .counter { text-align: right; }
+  .counter b { display: block; font: 900 clamp(64px, 10vw, 110px)/.85 var(--sans); font-stretch: 62%; color: var(--accent); }
+  .recent { margin-bottom: 34px; }
+  .recent-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .recent-list li { border: 1px solid var(--line); padding: 8px 12px; font: 13px var(--mono); }
+  .recent-list li span { color: var(--muted); margin-right: 8px; }
+  @media (max-width: 640px) { .gig .acts { grid-column: 2; justify-content: flex-start; } .counter { text-align: left; } }
 
   /* boeken */
   .book { text-align: center; overflow: hidden; }
@@ -212,6 +227,7 @@
   <div class="wrap">
     <div class="head reveal">
       <div><div class="label"><span class="live">Live</span> agenda</div><h2>Next <em>up</em></h2></div>
+      <a class="toggle" id="subscribe" href="gigs.ics">＋ Volg mijn agenda</a>
     </div>
     <ul class="gigs reveal" id="gigs"><li class="empty">Optredens laden…</li></ul>
   </div>
@@ -233,7 +249,14 @@
 
 <section id="ervaring">
   <div class="wrap">
-    <div class="head reveal"><div><div class="label">Achter de decks</div><h2>Gedraaid <em>in</em></h2></div></div>
+    <div class="head reveal">
+      <div><div class="label">Achter de decks</div><h2>Gedraaid <em>in</em></h2></div>
+      <div class="counter" id="counter" hidden><b id="count">0</b><span class="label">optredens dit jaar</span></div>
+    </div>
+    <div class="recent reveal" id="recent" hidden>
+      <div class="label">Recent</div>
+      <ul class="recent-list" id="recent-list"></ul>
+    </div>
     <ul class="venues reveal">
       <li>Club Havana <small>Resident</small></li>
       <li>Fakbar HdR <small>Leuven</small></li>
@@ -273,6 +296,9 @@ const BOOKING_EMAIL = "";
 // Je SoundCloud-profiel: de site haalt hier automatisch je laatste uploads op.
 const SOUNDCLOUD_PROFILE = "https://soundcloud.com/user-676091835-898344824";
 const MAX_TRACKS = 6;
+// GoatCounter (gratis bezoekers tellen): vul je code in, bv. "djrym" voor djrym.goatcounter.com. Leeg = uit.
+const GOATCOUNTER = "";
+const SITE = "https://djr3m7.github.io/djrym/";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = matchMedia("(hover: hover)").matches;
@@ -283,6 +309,22 @@ if (BOOKING_EMAIL) {
   b.href = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent("Booking DJ RYM")}`;
   b.removeAttribute("target");
 }
+
+/* ================= bezoekers tellen (GoatCounter, zonder cookies) ================= */
+function countEvent(name) {
+  if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: name, title: name, event: true});
+}
+if (GOATCOUNTER) {
+  const gc = document.createElement("script");
+  gc.async = true; gc.src = "https://gc.zgo.at/count.js";
+  gc.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
+  document.head.appendChild(gc);
+  document.addEventListener("click", e => {
+    const a = e.target.closest("#mail-btn, .socials a, #subscribe");
+    if (a) countEvent(a.id === "mail-btn" ? "klik-boeken" : a.id === "subscribe" ? "klik-agenda" : "klik-" + a.textContent.trim().toLowerCase());
+  });
+}
+document.getElementById("subscribe").href = SITE.replace(/^https:/, "webcal:") + "gigs.ics";
 
 /* ================= lasers in de hero ================= */
 (() => {
@@ -366,15 +408,79 @@ async function loadGigs() {
     return `<li class="gig ${i === 0 ? "next" : ""}">
       <div class="date">${d.getDate()} ${MAANDEN[d.getMonth()]}<small>${DAGEN[d.getDay()]}${g.tijd ? " · " + esc(g.tijd) : ""}</small></div>
       <div><h3>${esc(g.naam)}${i === 0 ? '<span class="next-tag">NEXT</span>' : ""}</h3>${g.plaats ? `<p>${esc(g.plaats)}</p>` : ""}</div>
-      ${link ? `<a class="more" href="${esc(link)}" target="_blank" rel="noopener">Info ↗</a>` : ""}
+      <div class="acts">
+        <button type="button" class="more" data-ics="${i}">＋ Agenda</button>
+        ${link ? `<a class="more" href="${esc(link)}" target="_blank" rel="noopener">Info ↗</a>` : ""}
+      </div>
     </li>`;
   }).join("") : `<li class="empty">Nog geen nieuwe data aangekondigd. Boek mij voor de volgende →</li>`;
+  currentGigs = gigs;
+  structuredData(gigs);
+
+  const voorbij = data.voorbij || [];
+  document.getElementById("recent").hidden = !voorbij.length;
+  document.getElementById("recent-list").innerHTML = voorbij.slice(0, 8).map(g => {
+    const d = new Date(g.datum + "T00:00");
+    return `<li><span>${d.getDate()} ${MAANDEN[d.getMonth()]}</span>${esc(g.naam)}</li>`;
+  }).join("");
+  if (data.aantal_dit_jaar) {
+    document.getElementById("counter").hidden = false;
+    document.getElementById("count").textContent = data.aantal_dit_jaar;
+  }
   if (data.bijgewerkt) {
     const u = new Date(data.bijgewerkt);
     document.getElementById("updated").textContent =
       `Live bijgewerkt ${u.toLocaleDateString("nl-BE", {day: "numeric", month: "short"})} ${u.toLocaleTimeString("nl-BE", {hour: "2-digit", minute: "2-digit"})}`;
   }
 }
+let currentGigs = [];
+
+// Google: optredens als "evenementen" (structured data)
+function structuredData(gigs) {
+  document.getElementById("ld-events")?.remove();
+  if (!gigs.length) return;
+  const events = gigs.map(g => ({
+    "@context": "https://schema.org", "@type": "MusicEvent",
+    "name": `DJ RYM @ ${g.naam}`,
+    "startDate": g.tijd ? `${g.datum}T${g.tijd}:00+01:00` : g.datum,
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "location": {"@type": "Place", "name": g.naam, "address": g.plaats || g.naam},
+    "performer": {"@type": "Person", "name": "DJ RYM", "url": SITE},
+    "image": SITE + "logo.png",
+    ...(g.link ? {"url": g.link} : {}),
+  }));
+  const s = document.createElement("script");
+  s.type = "application/ld+json"; s.id = "ld-events"; s.textContent = JSON.stringify(events);
+  document.head.appendChild(s);
+}
+
+// "+ Agenda": één optreden in je eigen agenda zetten
+document.getElementById("gigs").addEventListener("click", e => {
+  const b = e.target.closest("[data-ics]"); if (!b) return;
+  const g = currentGigs[+b.dataset.ics]; if (!g) return;
+  const d = g.datum.replace(/-/g, ""), pad = n => String(n).padStart(2, "0");
+  let when;
+  if (g.tijd) {
+    const s = new Date(`${g.datum}T${g.tijd}:00`), e2 = new Date(s.getTime() + 4 * 3600e3);
+    const f = x => `${x.getFullYear()}${pad(x.getMonth() + 1)}${pad(x.getDate())}T${pad(x.getHours())}${pad(x.getMinutes())}00`;
+    when = [`DTSTART;TZID=Europe/Brussels:${f(s)}`, `DTEND;TZID=Europe/Brussels:${f(e2)}`];
+  } else {
+    const n = new Date(g.datum + "T00:00"); n.setDate(n.getDate() + 1);
+    when = [`DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${n.getFullYear()}${pad(n.getMonth() + 1)}${pad(n.getDate())}`];
+  }
+  const clean = s => String(s || "").replace(/[\\;,]/g, m => "\\" + m).replace(/\n/g, " ");
+  const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DJ RYM//site//NL", "BEGIN:VEVENT",
+    `UID:${d}-${encodeURIComponent(g.naam)}@djrym`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`,
+    ...when, `SUMMARY:${clean("DJ RYM @ " + g.naam)}`, ...(g.plaats ? [`LOCATION:${clean(g.plaats)}`] : []),
+    `URL:${SITE}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics], {type: "text/calendar"}));
+  a.download = `djrym-${g.datum}.ics`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  countEvent("klik-agenda-optreden");
+});
+
 loadGigs(); setInterval(loadGigs, 120000);
 
 /* ================= sound: eigen spelers via de SoundCloud Widget API ================= */
@@ -440,6 +546,7 @@ loadGigs(); setInterval(loadGigs, 120000);
     current = i;
     widget.skip(i);
     widget.play();
+    countEvent("speel-track");
     box.querySelectorAll(".wave i.on").forEach(b => b.classList.remove("on"));
     setPlayingUI(i, true);
   }

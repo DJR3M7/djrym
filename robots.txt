@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://djr3m7.github.io/djrym/sitemap.xml

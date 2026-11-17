@@ -7,9 +7,10 @@
 <meta name="description" content="DJ RYM: allround DJ (drum and bass, techno, trance, club). Resident in Club Havana. Boek DJ RYM voor je fakbar, fuif, TD of jeugdhuis.">
 <meta property="og:title" content="DJ RYM">
 <meta property="og:description" content="Allround DJ · DnB · Techno · Trance · Club">
-<meta property="og:image" content="logo.png">
+<meta property="og:image" content="https://djrym.be/logo.png">
+<meta property="og:url" content="https://djrym.be/">
 <meta name="theme-color" content="#070707">
-<link rel="canonical" href="https://djr3m7.github.io/djrym/">
+<link rel="canonical" href="https://djrym.be/">
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,7 +228,6 @@
   <div class="wrap">
     <div class="head reveal">
       <div><div class="label"><span class="live">Live</span> agenda</div><h2>Next <em>up</em></h2></div>
-      <a class="toggle" id="subscribe" href="gigs.ics">＋ Volg mijn agenda</a>
     </div>
     <ul class="gigs reveal" id="gigs"><li class="empty">Optredens laden…</li></ul>
   </div>
@@ -298,7 +298,7 @@ const SOUNDCLOUD_PROFILE = "https://soundcloud.com/user-676091835-898344824";
 const MAX_TRACKS = 6;
 // GoatCounter (gratis bezoekers tellen): vul je code in, bv. "djrym" voor djrym.goatcounter.com. Leeg = uit.
 const GOATCOUNTER = "";
-const SITE = "https://djr3m7.github.io/djrym/";
+const SITE = "https://djrym.be/";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canHover = matchMedia("(hover: hover)").matches;
@@ -324,7 +324,6 @@ if (GOATCOUNTER) {
     if (a) countEvent(a.id === "mail-btn" ? "klik-boeken" : a.id === "subscribe" ? "klik-agenda" : "klik-" + a.textContent.trim().toLowerCase());
   });
 }
-document.getElementById("subscribe").href = SITE.replace(/^https:/, "webcal:") + "gigs.ics";
 
 /* ================= lasers in de hero ================= */
 (() => {

@@ -1,5 +1,5 @@
 {
- "bijgewerkt": "2026-11-16T17:08+01:00",
+ "bijgewerkt": "2026-11-17T20:25+01:00",
  "optredens": [
   {
    "datum": "2026-11-20",
@@ -8,5 +8,7 @@
    "plaats": "Club Havana mol",
    "link": null
   }
- ]
+ ],
+ "voorbij": [],
+ "aantal_dit_jaar": 0
 }

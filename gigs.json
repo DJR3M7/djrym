@@ -1,13 +1,6 @@
 {
- "bijgewerkt": "2026-11-19T15:05+01:00",
+ "bijgewerkt": "2026-11-21T02:51+01:00",
  "optredens": [
-  {
-   "datum": "2026-11-20",
-   "tijd": null,
-   "naam": "Pink Party",
-   "plaats": "Club Havana mol",
-   "link": null
-  },
   {
    "datum": "2026-12-11",
    "tijd": null,
@@ -23,6 +16,12 @@
    "link": null
   }
  ],
- "voorbij": [],
- "aantal_dit_jaar": 0
+ "voorbij": [
+  {
+   "datum": "2026-11-20",
+   "naam": "Pink Party",
+   "plaats": "Club Havana mol"
+  }
+ ],
+ "aantal_dit_jaar": 1
 }
